@@ -16,7 +16,6 @@ export default function Home(props) {
       <Head>
         <title>API Examples</title>
         <meta name="description" content="Test several APIs" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
@@ -41,6 +40,9 @@ export default function Home(props) {
 }
 
 export async function getServerSideProps({ req, res }) {
+  // in-memory caching does not seem to be working in this case.
+  // See note on [localForage](https://github.com/localForage/localForage)
+  // TODO: swap to [Redis](https://www.npmjs.com/package/axios-cache-adapter)
   const api = axios.create({
     adapter: cache.adapter,
   });
@@ -50,8 +52,6 @@ export async function getServerSideProps({ req, res }) {
 
   const IP_API_URL = `http://api.ipapi.com/${ipData.data.ip}?access_key=${accessKey}`;
   const apiData = await api({ url: IP_API_URL, method: "GET" });
-
-  console.log("fetched ip data");
 
   return {
     props: { apiData: apiData.data },
